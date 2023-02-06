@@ -13,23 +13,48 @@ app.use(express.json())
 // used for showing log access in api endpoint
 app.use(morgan('tiny'))
 
-app.get(`${api}/products`,(req,res)=>{
-    const product = {
-        id:1,
-        name:'Hairdresser',
-        image: 'some_url'
+// schema is table structure in sql
+const productSchema = mongoose.Schema({
+    name: String,
+    image: String,
+    countInStock: {
+        type: Number,
+        required: true,
+    },
+})
+
+const Product = mongoose.model('Product', productSchema)
+
+app.get(`${api}/products`, async (req,res)=>{
+    const productList = await Product.find();
+
+    if(!productList) {
+        res.status(500).json({success: false})
     }
-    res.send(product)
+    
+    res.send(productList);
 })
 
 app.post(`${api}/products`,(req,res)=>{
-    //get data from user edp post
-    const newProduct = req.body;
-    console.log(newProduct);
-    res.send(newProduct);
+    const product = new Product({
+        name: req.body.name,
+        image: req.body.image,
+        countInStock: req.body.countInStock
+    })
+    product.save().then((createdProduct => {
+        res.status(201).json(createdProduct)
+    })).catch((err)=>{
+        res.status(500).json({
+            error: err,
+            success: false
+        })
+    })
 })
+
 mongoose.set('strictQuery',false);
-mongoose.connect(process.env.CONNECTION_STRING).then(()=>{
+mongoose.connect(process.env.CONNECTION_STRING,{
+    dbName: "eshop-database",
+}).then(()=>{
     console.log('Database Ready')
 }).catch((err)=>{
     console.log(err);
