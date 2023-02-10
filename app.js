@@ -11,6 +11,7 @@ const productsRoutes = require('./routers/products');
 const categoriesRoutes = require('./routers/categories');
 const usersRoutes = require('./routers/users');
 const ordersRoutes = require('./routers/orders');
+const authJwt = require('./helpers/jwt');
 
 app.use(cors());
 app.options('*',cors());
@@ -20,6 +21,7 @@ app.options('*',cors());
 app.use(express.json());
 // used for showing log access in api endpoint
 app.use(morgan('tiny'));
+app.use(authJwt());
 
 app.use(`${api}/products`, productsRoutes);
 app.use(`${api}/categories`, categoriesRoutes);
