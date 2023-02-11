@@ -56,6 +56,7 @@ router.post('/login', async(req,res)=>{
         const secret = process.env.secret;
         const token = jwt.sign({
             userId: user.id,
+            isAdmin: user.isAdmin,
         }, secret, {
             expiresIn: '1d',
         });
@@ -68,5 +69,32 @@ router.post('/login', async(req,res)=>{
         res.status(400).send('password is wrong!');
     }
 });
+
+router.get(`/get/count`, async (req,res)=>{
+    const userCount = await User.countDocuments();
+
+    if(!userCount) {
+        res.status(500).json({success: false})
+    }
+    
+    res.send({
+        userCount: userCount
+    });
+});
+
+router.delete(`/:id`, (req,res)=>{
+    User.findByIdAndRemove(req.params.id).then(user=>{
+        if(user) {
+            return res.status(200).json({success: true, message: 'the user is deleted!'})
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: "User cannot be deleted!",
+            })
+        }
+    }).catch(err=>{
+        return res.status(400).json({success: false, error: err});
+    })
+})
 
 module.exports = router;

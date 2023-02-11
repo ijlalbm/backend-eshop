@@ -12,6 +12,8 @@ const categoriesRoutes = require('./routers/categories');
 const usersRoutes = require('./routers/users');
 const ordersRoutes = require('./routers/orders');
 const authJwt = require('./helpers/jwt');
+const errorHandler = require('./helpers/error-handler');
+
 
 app.use(cors());
 app.options('*',cors());
@@ -22,6 +24,7 @@ app.use(express.json());
 // used for showing log access in api endpoint
 app.use(morgan('tiny'));
 app.use(authJwt());
+app.use(errorHandler);
 
 app.use(`${api}/products`, productsRoutes);
 app.use(`${api}/categories`, categoriesRoutes);
@@ -31,6 +34,8 @@ app.use(`${api}/orders`, ordersRoutes);
 // mongodb connection
 mongoose.set('strictQuery',false);
 mongoose.connect(process.env.CONNECTION_STRING,{
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
     dbName: "eshop-database",
 }).then(()=>{
     console.log('Database Ready')
