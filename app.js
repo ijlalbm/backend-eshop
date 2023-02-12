@@ -14,7 +14,6 @@ const ordersRoutes = require('./routers/orders');
 const authJwt = require('./helpers/jwt');
 const errorHandler = require('./helpers/error-handler');
 
-
 app.use(cors());
 app.options('*',cors());
 
