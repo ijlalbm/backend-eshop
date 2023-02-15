@@ -24,6 +24,7 @@ app.use(express.json());
 app.use(morgan('tiny'));
 app.use(authJwt());
 app.use(errorHandler);
+app.use("/public/uploads", express.static(__dirname + "/public/uploads"));
 
 app.use(`${api}/products`, productsRoutes);
 app.use(`${api}/categories`, categoriesRoutes);
@@ -35,13 +36,14 @@ mongoose.set('strictQuery',false);
 mongoose.connect(process.env.CONNECTION_STRING,{
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    dbName: "eshop-database",
+    dbName: process.env.DB_NAME,
 }).then(()=>{
     console.log('Database Ready')
 }).catch((err)=>{
     console.log(err);
 });
 
-app.listen(3000,()=>{
-    console.log('Server is running http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT,()=>{
+    console.log(`Server is running http://localhost:${PORT}`);
 })
